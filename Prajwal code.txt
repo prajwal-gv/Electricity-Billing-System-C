@@ -1,0 +1,204 @@
+#include <stdio.h>
+#include <time.h>
+
+void print_date_time() {
+    time_t now;
+    struct tm due_date;
+
+    // Get current time
+    time(&now);
+    struct tm *current = localtime(&now);
+
+    // Print Bill Generated Date and Time
+    printf("Bill Generated Date  : %02d-%02d-%d %02d:%02d:%02d\n",
+           current->tm_mday, current->tm_mon + 1, current->tm_year + 1900,
+           current->tm_hour, current->tm_min, current->tm_sec);
+
+    // Calculate due date (15 days from bill date)
+    due_date = *current;
+    due_date.tm_mday += 15;
+    mktime(&due_date); // Normalize
+
+    printf("Due Date             : %02d-%02d-%d\n",
+           due_date.tm_mday, due_date.tm_mon + 1, due_date.tm_year + 1900);
+}
+
+float apply_penalty(float amount) {
+    float penalty = amount * 0.05;
+    printf("Late Payment Penalty : %.2f INR\n", penalty);
+    return amount + penalty;
+}
+
+float resid() {
+    float pr_unit, cur_unit, units, rate = 0, gst, total;
+
+    printf("\n----------- RESIDENTIAL METER READINGS -----------\n");
+    printf("Previous Reading         : ");
+    scanf("%f", &pr_unit);
+    printf("Current Reading          : ");
+    scanf("%f", &cur_unit);
+
+    units = cur_unit - pr_unit;
+    printf("Total Units Consumed     : %.2f \n", units);
+    printf("\n------------------- BILL DETAILS -------------------\n");
+    printf("Fixed Charges                 : 50.00 INR\n");
+
+    // Print slab details
+    if (units > 0 && units <= 50) {
+        printf("Slab Applied                  : 0 - 50 Units (₹3/unit)\n");
+        rate = (units * 3) + 50;
+    } else if (units <= 100) {
+        printf("Slab Applied                  : 51 - 100 Units (₹4/unit)\n");
+        rate = (units * 4) + 50;
+    } else if (units <= 150) {
+        printf("Slab Applied                  : 101 - 150 Units (₹5/unit)\n");
+        rate = (units * 5) + 50;
+    } else {
+        printf("Slab Applied                  : Above 150 Units (₹6/unit)\n");
+        rate = (units * 6) + 50;
+    }
+
+    gst = rate * 0.18;
+    printf("GST @ 18%%                    : %.2f INR\n", gst);
+    total = rate + gst;
+    printf("Total Amount (Before Due)     : %.2f INR\n", total);
+    
+    return total;
+}
+
+
+float commercial() {
+    float load, hours, units, rate, gst, total;
+
+    printf("\n----------- COMMERCIAL BILLING -----------\n");
+    printf("Connected Load (kW)           : ");
+    scanf("%f", &load);
+    printf("Usage per Day (hours)         : ");
+    scanf("%f", &hours);
+
+    units = load * hours * 30;
+    printf("Estimated Monthly Units       : %.2f \n", units);
+    printf("\n------------------- BILL DETAILS -------------------\n");
+    printf("Fixed Charges                 : 100.00 INR\n");
+
+    if (units > 0 && units <= 400) {
+        printf("Slab Applied                  : 0 - 400 Units (₹6.5/unit)\n");
+        rate = (units * 6.5) + 100;
+    } else if (units <= 800) {
+        printf("Slab Applied                  : 401 - 800 Units (₹7/unit)\n");
+        rate = (units * 7) + 100;
+    } else if (units <= 1200) {
+        printf("Slab Applied                  : 801 - 1200 Units (₹7.5/unit)\n");
+        rate = (units * 7.5) + 100;
+    } else {
+        printf("Slab Applied                  : Above 1200 Units (₹8/unit)\n");
+        rate = (units * 8) + 100;
+    }
+
+    gst = rate * 0.18;
+    printf("GST @ 18%%                    : %.2f INR\n", gst);
+    total = rate + gst;
+    printf("Total Amount (Before Due)     : %.2f INR\n", total);
+
+    return total;
+}
+
+
+float industry() {
+    float load, hours, units, rate, gst, total;
+
+    printf("\n----------- INDUSTRIAL BILLING -----------\n");
+    printf("Connected Load (kW)           : ");
+    scanf("%f", &load);
+    printf("Usage per Day (hours)         : ");
+    scanf("%f", &hours);
+
+    units = load * hours * 30;
+    printf("Estimated Monthly Units       : %.2f \n", units);
+    printf("\n------------------- BILL DETAILS -------------------\n");
+    printf("Fixed Charges                 : 120.00 INR\n");
+
+    if (units > 0 && units <= 400) {
+        printf("Slab Applied                  : 0 - 400 Units (₹7/unit)\n");
+        rate = (units * 7) + 120;
+    } else if (units <= 800) {
+        printf("Slab Applied                  : 401 - 800 Units (₹7.5/unit)\n");
+        rate = (units * 7.5) + 120;
+    } else if (units <= 1200) {
+        printf("Slab Applied                  : 801 - 1200 Units (₹8/unit)\n");
+        rate = (units * 8) + 120;
+    } else {
+        printf("Slab Applied                  : Above 1200 Units (₹8.5/unit)\n");
+        rate = (units * 8.5) + 120;
+    }
+
+    gst = rate * 0.18;
+    printf("GST @ 18%%                    : %.2f INR\n", gst);
+    total = rate + gst;
+    printf("Total Amount (Before Due)     : %.2f INR\n", total);
+
+    return total;
+}
+
+
+int main() {
+    int id, consumer_type, is_late;
+    char name[30], address[50];
+    float final_amount = 0;
+
+    printf("=============== ELECTRICITY BILL ===============\n");
+
+    // Customer info
+    printf("\n--------------- CUSTOMER DETAILS ---------------\n");
+    printf("Enter Customer ID            : ");
+    scanf("%d", &id);
+    printf("Enter Customer Name          : ");
+    scanf("%s", name);
+    printf("Enter Customer Address       : ");
+    scanf("%s", address);
+
+    // Consumer type
+    printf("\nSelect Consumer Type:\n");
+    printf("1 - Residential\n2 - Commercial\n3 - Industrial\n");
+    printf("Enter your choice (1/2/3)     : ");
+    scanf("%d", &consumer_type);
+
+    // Print bill header
+    //printf("\n--------------- BILL INFORMATION ---------------\n");
+    
+
+    switch (consumer_type) {
+        case 1:
+            final_amount = resid();
+            break;
+        case 2:
+            final_amount = commercial();
+            break;
+        case 3:
+            final_amount = industry();
+            break;
+        default:
+            printf("Invalid consumer type selected!\n");
+            return 1;
+    }
+
+    // Ask if payment is made after due date
+    printf("\nIs Payment after Due Date? (1-Yes / 0-No): ");
+    scanf("%d", &is_late);
+
+    if (is_late == 1) {
+        final_amount = apply_penalty(final_amount);
+    }
+
+    // Summary
+    printf("\n--------------- PAYMENT SUMMARY ---------------\n");
+    printf("Customer ID                : %d\n", id);
+    printf("Name                       : %s\n", name);
+    printf("Address                    : %s\n", address);
+    printf("Amount Payable             : %.2f INR\n", final_amount);
+    printf("================================================\n");
+    print_date_time();
+    printf("=====================THANK YOU==================\n");
+
+    return 0;
+}
